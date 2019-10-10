@@ -35,10 +35,11 @@ var imagenesRoutes = require('./routes/imagenes');
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 // Conexion a la base de datos
 const MongoClient = require('mongodb').MongoClient;
+MongoClient.connect
 const uri = "mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true });
 client.connect(err => {
-    const collection = client.db("test").collection("devices");
+    const collection = client.db("test").collection("usuarios");
     // perform actions on the collection object
     client.close();
 });
