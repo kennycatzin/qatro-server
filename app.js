@@ -9,7 +9,6 @@ var bodyParser = require('body-parser');
 var app = express();
 
 
-
 // CORS
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
@@ -33,23 +32,12 @@ var imagenesRoutes = require('./routes/imagenes');
 // mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 // entorno local: mongodb://localhost:27017/backend
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
-// Conexion a la base de datos
-const MongoClient = require('mongodb').MongoClient;
-MongoClient.connect
-const uri = "mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-    const collection = client.db("test").collection("usuarios");
-    // perform actions on the collection object
-    client.close();
+//Conexion a la base de datos
+mongoose.connection.openUri('mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority', (err, res) => {
+    if (err) throw err;
+    console.log('Base de datos:  \x1b[32m%s\x1b[0m', 'online');
+
 });
-
-// mongoose.connection.openUri('mongodb://localhost:27017/qatro-backend', (err, res) => {
-//     if (err) throw err;
-//     console.log('Base de datos:  \x1b[32m%s\x1b[0m', 'online');
-
-// });
-
 // Server index config
 var serveIndex = require('serve-index');
 app.use(express.static(__dirname + '/'));
