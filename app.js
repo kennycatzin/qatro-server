@@ -3,7 +3,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
 
 //Iniciar variables
 
@@ -35,7 +34,7 @@ var imagenesRoutes = require('./routes/imagenes');
 // entorno local: mongodb://localhost:27017/backend
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 // Conexion a la base de datos
-
+const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true });
 client.connect(err => {
