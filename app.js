@@ -1,4 +1,6 @@
 // Require
+var moment = require('moment-timezone');
+moment().tz('America/Los_Angeles').format();
 
 var express = require('express');
 var mongoose = require('mongoose');
@@ -23,6 +25,12 @@ app.set('port', process.env.PORT || 3000);
 //Importaciòn de rutas
 var appRoutes = require('./routes/app');
 var userRoutes = require('./routes/usuario');
+var coachRoutes = require('./routes/coach');
+var testRoutes = require('./routes/test');
+var calendarioRoutes = require('./routes/calendario');
+
+var disciplinaRoutes = require('./routes/disciplina');
+var paqueteRoutes = require('./routes/paquete');
 var LoginRoutes = require('./routes/login');
 var busquedaRoutes = require('./routes/busqueda');
 var uploadRoutes = require('./routes/upload');
@@ -30,7 +38,7 @@ var imagenesRoutes = require('./routes/imagenes');
 
 
 // mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
-// entorno local: mongodb://localhost:27017/backend
+// entorno local: mongodb://localhost:27017/qatro-server
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 //Conexion a la base de datos
 mongoose.connection.openUri('mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority', (err, res) => {
@@ -48,6 +56,12 @@ app.use('/uploads', serveIndex(__dirname + '/uploads'));
 
 // Rutas
 app.use('/usuario', userRoutes);
+app.use('/paquete', paqueteRoutes);
+app.use('/coach', coachRoutes);
+app.use('/test', testRoutes);
+app.use('/calendario', calendarioRoutes);
+
+app.use('/disciplina', disciplinaRoutes);
 app.use('/login', LoginRoutes);
 app.use('/busqueda', busquedaRoutes);
 app.use('/upload', uploadRoutes);
