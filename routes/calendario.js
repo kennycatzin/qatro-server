@@ -6,7 +6,7 @@ var mdAutenticacion = require('./../middlewares/autenticacion');
 var mongoose = require('mongoose');
 var EmailCtrl = require('./mailCtrl');
 var Usuario = require('./../models/usuario');
-
+var holaaaaaaa = '';
 //Rutas
 app.get('/', (req, res, next) => {
    var limite = new Date();
