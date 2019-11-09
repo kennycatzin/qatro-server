@@ -77,6 +77,10 @@ router.post('/', (req, res) => {
     var body = req.body;
     var usuario = new Usuario({
         name: body.name,
+        apellidoPaterno: body.apellidoPaterno,
+        apellidoMaterno: body.apellidoMaterno,
+        fechaNacimiento: body.fechaNacimiento,
+        genero: body.genero,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,

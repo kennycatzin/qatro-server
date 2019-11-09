@@ -40,13 +40,56 @@ router.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB._id
+            id: usuarioDB._id,
+            menu: obtenerMenu(usuarioDB.role)
         });
     });
 
 
 })
 
+function obtenerMenu( ROLE ) {
+    var menu = [
+        {
+            titulo: 'Calendario',
+            url: '/calendario'
+          },
+          {
+            titulo: 'Coaches',
+            url: '/coaches'
+          },
+          {
+            titulo: 'Paquetes',
+            url: '/paquetes'
+          }
+      ];
 
+      var adminMenu = [
+        {
+            titulo: 'Calendario',
+            url: '/admin_calendario'
+          },
+          {
+            titulo: 'Coaches',
+            url: '/admin_coaches'
+          },
+          {
+            titulo: 'Disciplinas',
+            url: '/admin_disciplinas'
+          },
+          {
+            titulo: 'Paquetes',
+            url: '/admin_paquetes'
+          },
+          {
+            titulo: 'Usuarios',
+            url: '/admin_usuarios'
+          }
+      ]
+if ( ROLE === 'ADMIN_ROLE') {
+    return adminMenu;
+} 
+    return menu;
+}
 
 module.exports = router;

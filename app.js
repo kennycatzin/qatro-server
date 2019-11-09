@@ -28,6 +28,8 @@ var userRoutes = require('./routes/usuario');
 var coachRoutes = require('./routes/coach');
 var testRoutes = require('./routes/test');
 var calendarioRoutes = require('./routes/calendario');
+var espacioRoutes = require('./routes/espacio');
+var paqueteUsuario = require('./routes/paqueteUsuario');
 
 var disciplinaRoutes = require('./routes/disciplina');
 var paqueteRoutes = require('./routes/paquete');
@@ -36,12 +38,13 @@ var busquedaRoutes = require('./routes/busqueda');
 var uploadRoutes = require('./routes/upload');
 var imagenesRoutes = require('./routes/imagenes');
 
-
+var local = 'mongodb://localhost:27017/qatro-server';
+var prod = 'mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority';
 // mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 // entorno local: mongodb://localhost:27017/qatro-server
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 //Conexion a la base de datos
-mongoose.connection.openUri('mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority', (err, res) => {
+mongoose.connection.openUri(local, (err, res) => {
     if (err) throw err;
     console.log('Base de datos:  \x1b[32m%s\x1b[0m', 'online');
 
@@ -60,6 +63,9 @@ app.use('/paquete', paqueteRoutes);
 app.use('/coach', coachRoutes);
 app.use('/test', testRoutes);
 app.use('/calendario', calendarioRoutes);
+app.use('/espacio', espacioRoutes);
+app.use('/paqusuario', paqueteUsuario);
+
 
 app.use('/disciplina', disciplinaRoutes);
 app.use('/login', LoginRoutes);
