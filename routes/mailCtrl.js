@@ -5,27 +5,28 @@ exports.disparar = function(vari) {
     tipo = vari;
     this.sendEmail();
 }
+
 function formatDate(date) {
     var monthNames = [
-      "Enero", "Febrero", "Marzo",
-      "Abril", "May0", "Junio", "Julio",
-      "Agosto", "Septiembre", "Octubre",
-      "Noviembre", "Diciembre"
+        "Enero", "Febrero", "Marzo",
+        "Abril", "May0", "Junio", "Julio",
+        "Agosto", "Septiembre", "Octubre",
+        "Noviembre", "Diciembre"
     ];
-  
+
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-  
+
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
-  }
+}
 
 
 exports.sendEmail = function(req, res) {
     // Definimos el transporter
     var req2 = req[0];
     var req1 = req[1];
-    var userMail = req[1].emailUser; 
+    var userMail = req[1].emailUser;
     var username = 'kenny';
     var password = '12345';
     console.log(req);
@@ -39,15 +40,23 @@ exports.sendEmail = function(req, res) {
     console.log(dia);
     console.log(userMail);
     hoy = formatDate(hoy);
-fecha = formatDate(fecha);
+    fecha = formatDate(fecha);
     console.log('llegueeeee');
-    var transporter = nodemailer.createTransport({
-        service: 'Gmail',
+    var transporter = nodemailer.createTransport('SMTP', {
+        host: 'qatro.fit',
+        port: 587,
         auth: {
-            user: 'kenn2506@gmail.com',
-            pass: 'calapul2506'
+            user: 'hola@qatro.fit',
+            pass: 'hola2019qatro'
         }
     });
+    // var transporter = nodemailer.createTransport({
+    //     service: 'Gmail',
+    //     auth: {
+    //         user: 'kenn2506@gmail.com',
+    //         pass: 'calapul2506'
+    //     }
+    // });
     // Definimos el email
     var mailOptions = {
         from: 'kennycatzin@gmail.com',
@@ -204,10 +213,10 @@ fecha = formatDate(fecha);
             '        <tr>' +
             '            <td align="center">' +
             '                <table border="0" align="center" width="590" cellpadding="0" cellspacing="0" class="container590">' +
-                                '<tr>' +
+            '<tr>' +
             '                        <td align="center" style="color: #343434; font-size: 24px; font-family: Quicksand, Calibri, sans-serif; font-weight:700;letter-spacing: 3px; line-height: 35px;" class="main-header">' +
             '                            <div style="line-height: 35px">' +
-            '                                <span style="color: #EE784A;">'+ dis +'</span>' +
+            '                                <span style="color: #EE784A;">' + dis + '</span>' +
             '                            </div>' +
             '                        </td>' +
             '                    </tr>' +
@@ -223,7 +232,7 @@ fecha = formatDate(fecha);
             '                    <tr>' +
             '                        <td align="center" style="color: #343434; font-size: 24px; font-family: Quicksand, Calibri, sans-serif; font-weight:700;letter-spacing: 3px; line-height: 35px;" class="main-header">' +
             '                            <div style="line-height: 35px">' +
-            '                                '+ dia +' '+ fecha +' <span style="color: #EE784A;">'+ horario +'</span>' +
+            '                                ' + dia + ' ' + fecha + ' <span style="color: #EE784A;">' + horario + '</span>' +
             '                            </div>' +
             '                        </td>' +
             '                    </tr>' +
@@ -383,7 +392,7 @@ fecha = formatDate(fecha);
             '                                        <table align="center" border="0" cellpadding="0" cellspacing="0">' +
             '                                            <tr>' +
             '                                                <td align="center">' +
-            '                                                    <a style="font-size: 14px; font-family: "Work Sans", Calibri, sans-serif; line-height: 24px;color: #5caad2; text-decoration: none;font-weight:bold;" href="{{UnsubscribeURL}}">'+ hoy +'</a>' +
+            '                                                    <a style="font-size: 14px; font-family: "Work Sans", Calibri, sans-serif; line-height: 24px;color: #5caad2; text-decoration: none;font-weight:bold;" href="{{UnsubscribeURL}}">' + hoy + '</a>' +
             '                                                </td>' +
             '                                            </tr>' +
             '                                        </table>' +
