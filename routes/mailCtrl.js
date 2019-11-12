@@ -44,11 +44,11 @@ exports.sendEmail = function(req, res) {
     fecha = formatDate(fecha);
     console.log('llegueeeee');
     var transporter = nodemailer.createTransport(smtpTransport({
-        host: 'qatro.fit',
+        host: 'mail.serteza.com',
         port: 587,
         auth: {
-            user: 'hola@qatro.fit',
-            pass: 'hola2019qatro'
+            user: 'prorsum@serteza.com',
+            pass: '()j_%*.8n9Vz'
         }
     }));
     // var transporter = nodemailer.createTransport({
