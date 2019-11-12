@@ -44,7 +44,7 @@ exports.sendEmail = function(req, res) {
     fecha = formatDate(fecha);
     console.log('llegueeeee');
     var transporter = nodemailer.createTransport(smtpTransport({
-        host: 'mail.serteza.com',
+        host: 'serteza.com',
         port: 587,
         auth: {
             user: 'prorsum@serteza.com',
