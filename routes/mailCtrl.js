@@ -1,6 +1,5 @@
 var nodemailer = require('nodemailer');
 var tipo = '';
-var smtpTransport = require("nodemailer-smtp-transport");
 
 exports.disparar = function(vari) {
     tipo = vari;
@@ -43,21 +42,14 @@ exports.sendEmail = function(req, res) {
     hoy = formatDate(hoy);
     fecha = formatDate(fecha);
     console.log('llegueeeee');
-    var transporter = nodemailer.createTransport(smtpTransport({
-        host: 'serteza.com',
-        port: 587,
+
+    var transporter = nodemailer.createTransport({
+        service: 'Gmail',
         auth: {
-            user: 'prorsum@serteza.com',
-            pass: '()j_%*.8n9Vz'
+            user: 'kenn2506@gmail.com',
+            pass: 'calapul2506'
         }
-    }));
-    // var transporter = nodemailer.createTransport({
-    //     service: 'Gmail',
-    //     auth: {
-    //         user: 'kenn2506@gmail.com',
-    //         pass: 'calapul2506'
-    //     }
-    // });
+    });
     // Definimos el email
     var mailOptions = {
         from: 'kennycatzin@gmail.com',
