@@ -10,7 +10,7 @@ var mdAuth = require('./../middlewares/autenticacion');
 
 // Obtener todos los usuarios
 router.get('/', (req, res, next) => {
-    Usuario.find({}, 'nombre email img rol')
+    Usuario.find({})
         .exec(
             (err, usuarios) => {
                 if (err) {
@@ -30,7 +30,7 @@ router.get('/', (req, res, next) => {
 
 
 //Actualizar usuario
-router.put('/:id', mdAuth.verificaToken, (req, res) => {
+router.put('/:id', (req, res) => {
     var id = req.params.id;
     var body = req.body;
     Usuario.findById(id, (err, usuario) => {
@@ -48,9 +48,13 @@ router.put('/:id', mdAuth.verificaToken, (req, res) => {
                 errors: { message: 'no existe' }
             });
         }
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        usuario.name = body.name;
+        usuario.apellidoPaterno = body.apellidoPaterno;
+        usuario.apellidoMaterno = body.apellidoMaterno;
+        usuario.fechaNacimiento = body.fechaNacimiento;
+        usuario.genero = body.genero;
+        usuario.telefono = body.telefono;
+        usuario.img = body.img;
 
         usuario.save((err, usuarioGuardado) => {
             if (err) {
@@ -84,7 +88,8 @@ router.post('/', (req, res) => {
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,
-        role: body.role
+        role: body.role,
+        telefono: body.telefono
     });
     usuario.save((err, usuarioGuardado) => {
         if (err) {
@@ -97,7 +102,8 @@ router.post('/', (req, res) => {
         res.status(201).json({
             ok: true,
             usuario: usuarioGuardado,
-            usuarioToken: req.usuario
+            usuarioToken: req.usuario,
+            menu: obtenerMenu(usuarioGuardado.role)
         });
     });
 
@@ -125,4 +131,45 @@ router.delete('/:id', mdAuth.verificaToken, (req, res) => {
 
 
 
+function obtenerMenu(ROLE) {
+    var menu = [{
+            titulo: 'Calendario',
+            url: '/calendario'
+        },
+        {
+            titulo: 'Coaches',
+            url: '/coaches'
+        },
+        {
+            titulo: 'Paquetes',
+            url: '/paquetes'
+        }
+    ];
+
+    var adminMenu = [{
+            titulo: 'Calendario',
+            url: '/admin_calendario'
+        },
+        {
+            titulo: 'Coaches',
+            url: '/admin_coaches'
+        },
+        {
+            titulo: 'Disciplinas',
+            url: '/admin_disciplinas'
+        },
+        {
+            titulo: 'Paquetes',
+            url: '/admin_paquetes'
+        },
+        {
+            titulo: 'Usuarios',
+            url: '/admin_usuarios'
+        }
+    ]
+    if (ROLE === 'ADMIN_ROLE') {
+        return adminMenu;
+    }
+    return menu;
+}
 module.exports = router;

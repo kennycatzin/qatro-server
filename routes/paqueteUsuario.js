@@ -32,66 +32,66 @@ app.get('/numero/:id', (req, res, next) => {
     fecha = Date.now();
     console.log(userid);
 
-        PaqueteUsuario.count({"usuarioId": userid}, (err, conteo) =>{
-         
-            if (err) {
+    PaqueteUsuario.estimatedDocumentCount({ "usuarioId": userid }, (err, conteo) => {
+
+        if (err) {
             return res.status(500).json({
                 ok: false,
                 mensaje: 'Error buscar por usuario',
                 errors: err
             });
         }
-        console.log(conteo);
-           if (conteo===0) {
-                return res.status(500).json({
-                    ok: false,
-                    mensaje: 'Error buscar, Debe cargar un paquete',
-                    errors: err
-                });
-        } else {
-             PaqueteUsuario.aggregate(
-            [{ $match: { "usuarioId": userid, "numClases": { $gt: 0 } } },
-                {
-                    $project: {
-                        _id: null,
-                        clasesDisponibles: {
-                            $cond: [{ $gte: ["$finish_at", fechaHoy] }, { $sum: "$numClases" }, 0]
-                        },
-                        fecha: {
-                            $dateToString: { format: "%Y-%m-%d", date: "$finish_at" }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        total: {
-                            $sum: "$clasesDisponibles"
-                        },
-                        fecha: {
-                            $max: "$fecha"
-                        }
-                    }
-                }
-            ], (err, paqusuario) => {
-                if (err) {
-                    return res.status(500).json({
-                        ok: false,
-                        message: 'Ha ocurrido un error inesperado',
-                        errors: err
-                    });
-                }
-                console.log(paqusuario);
-                res.status(200).json({
-                    ok: true,
-                    total: paqusuario[0].total,
-                    fecha: paqusuario[0].fecha
-                });
+        console.log('conteo ' + conteo);
+        if (conteo === 0) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error buscar, Debe cargar un paquete',
+                errors: err
             });
+        } else {
+            PaqueteUsuario.aggregate(
+                [{ $match: { "usuarioId": userid } },
+                    {
+                        $project: {
+                            _id: null,
+                            clasesDisponibles: {
+                                $cond: [{ $gte: ["$finish_at", fechaHoy] }, { $sum: "$numClases" }, 0]
+                            },
+                            fecha: {
+                                $dateToString: { format: "%Y-%m-%d", date: "$finish_at" }
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            total: {
+                                $sum: "$clasesDisponibles"
+                            },
+                            fecha: {
+                                $max: "$fecha"
+                            }
+                        }
+                    }
+                ], (err, paqusuario) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            message: 'Ha ocurrido un error inesperado',
+                            errors: err
+                        });
+                    }
+                    console.log(paqusuario);
+                    res.status(200).json({
+                        ok: true,
+                        total: paqusuario[0].total,
+                        fecha: paqusuario[0].fecha
+                    });
+                });
         }
-        })
-       
-    
+    })
+
+
 
 
 
@@ -124,6 +124,3 @@ app.post('/', (req, res, next) => {
 
 
 module.exports = app;
-
-
-

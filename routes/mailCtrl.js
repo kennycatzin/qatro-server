@@ -1,5 +1,6 @@
 var nodemailer = require('nodemailer');
 var tipo = '';
+var smtpTransport = require("nodemailer-smtp-transport");
 
 exports.disparar = function(vari) {
     tipo = vari;
@@ -43,6 +44,15 @@ exports.sendEmail = function(req, res) {
     fecha = formatDate(fecha);
     console.log('llegueeeee');
 
+    // var transporter = nodemailer.createTransport(smtpTransport({
+    //     host: 'serteza.com',
+    //     port: 587,
+    //     secure: false, // upgrade later with STARTTLS
+    //     auth: {
+    //         user: 'prorsum@serteza.com',
+    //         pass: '()j_%*.8n9Vz'
+    //     }
+    // }));
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
@@ -52,7 +62,7 @@ exports.sendEmail = function(req, res) {
     });
     // Definimos el email
     var mailOptions = {
-        from: 'kennycatzin@gmail.com',
+        from: 'hola@qatro.fit',
         to: userMail,
         subject: 'Confirmación de clase',
         text: 'Contenido del email',

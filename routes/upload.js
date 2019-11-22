@@ -69,11 +69,11 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
                 });
             }
-            var pathViejo = '/uploads/usuarios/' + usuario.pic;
+            var pathViejo = '/uploads/usuarios/' + usuario.img;
             if (fs.existsSync(pathViejo)) {
                 fs.unlink(pathViejo);
             }
-            usuario.pic = nombreArchivo;
+            usuario.img = nombreArchivo;
             usuario.save((err, usuarioActualizado) => {
                 if (err) {
                     return res.status(500).json({

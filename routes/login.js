@@ -33,7 +33,7 @@ router.post('/', (req, res) => {
             });
         }
         //crear un token!!
-        usuarioDB.password = '....';
+        //musuarioDB.password = '....';
         var token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: 7000 });
 
         res.status(200).json({
@@ -48,47 +48,45 @@ router.post('/', (req, res) => {
 
 })
 
-function obtenerMenu( ROLE ) {
-    var menu = [
-        {
+function obtenerMenu(ROLE) {
+    var menu = [{
             titulo: 'Calendario',
             url: '/calendario'
-          },
-          {
+        },
+        {
             titulo: 'Coaches',
             url: '/coaches'
-          },
-          {
+        },
+        {
             titulo: 'Paquetes',
             url: '/paquetes'
-          }
-      ];
+        }
+    ];
 
-      var adminMenu = [
-        {
+    var adminMenu = [{
             titulo: 'Calendario',
             url: '/admin_calendario'
-          },
-          {
+        },
+        {
             titulo: 'Coaches',
             url: '/admin_coaches'
-          },
-          {
+        },
+        {
             titulo: 'Disciplinas',
             url: '/admin_disciplinas'
-          },
-          {
+        },
+        {
             titulo: 'Paquetes',
             url: '/admin_paquetes'
-          },
-          {
+        },
+        {
             titulo: 'Usuarios',
             url: '/admin_usuarios'
-          }
-      ]
-if ( ROLE === 'ADMIN_ROLE') {
-    return adminMenu;
-} 
+        }
+    ]
+    if (ROLE === 'ADMIN_ROLE') {
+        return adminMenu;
+    }
     return menu;
 }
 

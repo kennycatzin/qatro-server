@@ -7,11 +7,18 @@ var mongoose = require('mongoose');
 var EmailCtrl = require('./mailCtrl');
 var Usuario = require('./../models/usuario');
 var holaaaaaaa = '';
+var objFechaFunc = require('./../functions/funciones');
 //Rutas
 app.get('/', (req, res, next) => {
-   var limite = new Date();
-   limite = Date.now();
-    Calendario.find({})
+    var desde = req.query.desde || 0;
+    desde = Number(desde)
+    console.log(desde);
+    var limite = new Date();
+    limite.setDate(limite.getDate() - 1);
+    console.log(limite);
+    Calendario.find({"fecha": {$gte: limite}})
+        .skip(desde)
+        .limit(6)
         .populate('clases.disciplina_id', 'nombre img')
         .populate('clases.coach_id', 'alias img')
 
@@ -24,10 +31,14 @@ app.get('/', (req, res, next) => {
                     errors: err
                 });
             }
-            res.status(200).json({
-                ok: true,
-                calendario: calendario
-            });
+            Calendario.count({}, (err, conteo) => {
+                res.status(200).json({
+                    ok: true,
+                    calendario: calendario,
+                    total: conteo
+                });
+            })
+
         });
 });
 app.get('/portipo/:tipo/:id', (req, res, next) => {
@@ -59,7 +70,7 @@ app.get('/portipo/:tipo/:id', (req, res, next) => {
                 if (!calendario) {
                     return res.status(400).json({
                         ok: false,
-                        mensaje: 'El calendario con el id ' + id + ' no existe',
+                        mensaje: 'El calendario no existe',
                         errors: { message: 'no existe' }
                     });
                 }
@@ -166,6 +177,8 @@ app.put('/actualizar', (req, res) => {
     var espacio = body.espacio;
     var columna = body.columna;
     var clasesDisp = body.clasesDisp;
+    var objActualizar = '';
+    objActualizar = "clases.$.espacios." + espacio-1 + ".columnas." + columna-1 + ".usuario_id";
     if (clasesDisp <= 0) {
         return res.status(400).json({
             ok: false,
@@ -254,13 +267,17 @@ app.put('/actualizar', (req, res) => {
     console.log(newvalues);
     console.log(espacio);
     console.log(columna);
-
+ 
+    // newvalues = { $set: { `clases.$.espacios.${espacio}.columnas.${columna}.usuario_id`: usuarioId, objActualizar: 0, objActualizar: "disabled" } };
     var myquery = {
 
         'clases._id': claseId,
         'clases.espacios._id': espacioId,
         'clases.espacios.columnas._id': columnaId
     };
+    newvalues[objActualizar]=usuarioId;
+    console.log('maricon' + objActualizar);
+
     Calendario.find({ 'clases._id': claseId }, { '_id': false, 'dia': true, 'fecha': true, 'clases': { $elemMatch: { '_id': claseId } } })
         .populate('clases.disciplina_id', 'nombre')
         .populate('clases.coach_id', 'alias')
@@ -291,33 +308,36 @@ app.put('/actualizar', (req, res) => {
                         });
                     }
                     if (!usuario) {
-                        return res.status(400).json({
+                        return res.status(500).json({
                             ok: false,
-                            mensaje: 'El usuario con el id' + id + 'no existe',
-                            errors: { message: 'no existe' }
+                            mensaje: 'Error no existe el usuario',
+                            errors: err
                         });
+                        console.log('muyy mallllll');
                     }
                     console.log(usuario);
-                    calendarioEncontrado.push({emailUser: usuario.email});
+                    calendarioEncontrado.push({ emailUser: usuario.email });
                     console.log('aquii mirameeee');
 
-                console.log(calendarioEncontrado);
+                    console.log(calendarioEncontrado);
 
-                EmailCtrl.sendEmail(calendarioEncontrado);
-            
+                    EmailCtrl.sendEmail(calendarioEncontrado);
+
                 });
-                
+
             });
     Calendario.updateOne(myquery, newvalues).exec(
         (err, calendario) => {
             if (err) {
+                console.log('some bad');
+
                 return res.status(500).json({
                     ok: false,
                     message: 'Ha ocurrido un error inesperado',
                     errors: err
                 });
             }
-
+            console.log('some goooood');
             res.status(200).json({
                 ok: true,
                 calendario: calendario
