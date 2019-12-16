@@ -1,8 +1,55 @@
 var express = require('express');
 var router = express.Router();
 var Paquete = require('./../models/paquete');
+
+
+
+router.get('/admin/', (req, res, next) => {
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    Paquete.find({})
+        .skip(desde)
+        .limit(6)
+        .exec(
+            (err, paquetes) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando paquetes',
+                        errors: err
+                    });
+                }
+                Paquete.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        paquetes: paquetes,
+                        numero: conteo
+                    });
+                })
+
+            })
+});
+
+router.delete('/:id', (req, res) => {
+    var id = req.params.id;
+
+    Paquete.findByIdAndRemove(id, (err, paqueteBorrado) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al borrar paquete',
+                errors: err
+            });
+        }
+        res.status(200).json({
+            ok: true,
+            paquete: paqueteBorrado
+        });
+    });
+});
+
 router.get('/', (req, res, next) => {
-    Paquete.find({}, 'num_clases precio_unit vigencia')
+    Paquete.find({})
         .exec(
             (err, paquetes) => {
                 if (err) {
@@ -22,10 +69,11 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res) => {
     var body = req.body;
     var paquete = new Paquete({
-        num_clases: body.num_clases,
+        nombre: body.nombre,
+        numeroClases: body.numeroClases,
         vigencia: body.vigencia,
-        precio_unit: body.precio_unit,
-        usuario_id: body.usuario_id
+        precioUnitario: body.precioUnitario,
+        usuarioId: body.usuarioId
 
     });
     paquete.save((err, paqueteGuardado) => {

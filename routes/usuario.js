@@ -10,7 +10,11 @@ var mdAuth = require('./../middlewares/autenticacion');
 
 // Obtener todos los usuarios
 router.get('/', (req, res, next) => {
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
     Usuario.find({})
+        .skip(desde)
+        .limit(6)
         .exec(
             (err, usuarios) => {
                 if (err) {
@@ -20,10 +24,15 @@ router.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    usuarios: usuarios
-                });
+
+                Usuario.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        usuarios: usuarios,
+                        numero: conteo
+                    });
+                })
+
             })
 
 });
@@ -53,6 +62,7 @@ router.put('/:id', (req, res) => {
         usuario.apellidoMaterno = body.apellidoMaterno;
         usuario.fechaNacimiento = body.fechaNacimiento;
         usuario.genero = body.genero;
+        usuario.role = body.role;
         usuario.telefono = body.telefono;
         usuario.img = body.img;
 
@@ -111,7 +121,7 @@ router.post('/', (req, res) => {
 
 // Eliminar un usuario
 
-router.delete('/:id', mdAuth.verificaToken, (req, res) => {
+router.delete('/:id', (req, res) => {
     var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {

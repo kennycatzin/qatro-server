@@ -3,6 +3,7 @@ var app = express();
 // var Hospital = require('./../models/hospital');
 // var Medico = require('./../models/medico');
 var Usuario = require('./../models/usuario');
+var Paquete = require('./../models/paquete');
 
 //Rutas
 app.get('/coleccion/:tabla/:busqueda', (req, res) => {
@@ -10,14 +11,15 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
     var tabla = req.params.tabla;
     var regex = new RegExp(busqueda, 'i');
 
-    var promesa;
+    var promesa = '';
     switch (tabla) {
         case 'usuarios':
             promesa = buscarUsuario(busqueda, regex);
             break;
-            // case 'hospitales':
-            //     promesa = buscarHospitales(busqueda, regex);
-            //     break;
+        case 'paquetes':
+            console.log('ya llegue');
+            promesa = buscarPaquete(busqueda, regex);
+            break;
             // case 'medicos':
             //     promesa = buscarMedicos(busqueda, regex);
             //     break;
@@ -42,15 +44,14 @@ app.get('/todo/:busqueda', (req, res, next) => {
 
     Promise.all([
             // buscarHospitales(busqueda, regex),
-            // buscarMedicos(busqueda, regex),
+            buscarPaquete(busqueda, regex),
             buscarUsuario(busqueda, regex)
         ])
         .then(respuestas => {
             res.status(200).json({
                 ok: true,
-                hospitales: respuestas[0],
-                medicos: respuestas[1],
-                usuarios: respuestas[2]
+                paquete: respuestas[0],
+                usuarios: respuestas[1]
             });
         });
 
@@ -77,7 +78,7 @@ app.get('/todo/:busqueda', (req, res, next) => {
 
 function buscarUsuario(busqueda, regex) {
     return new Promise((resolve, reject) => {
-        Usuario.find({}, 'name email role')
+        Usuario.find({}, 'name email role img fechaNacimiento')
             .or([{ 'name': regex }, { 'email': regex }])
             .exec((err, usuarios) => {
 
@@ -85,6 +86,22 @@ function buscarUsuario(busqueda, regex) {
                     reject('Error al cargar usuarios', err);
                 } else {
                     resolve(usuarios);
+                }
+
+            })
+
+    });
+}
+
+function buscarPaquete(busqueda, regex) {
+    return new Promise((resolve, reject) => {
+        Paquete.find({})
+            .or([{ 'nombre': regex }])
+            .exec((err, paquetes) => {
+                if (err) {
+                    reject('Error al cargar paquetes', err);
+                } else {
+                    resolve(paquetes);
                 }
 
             })

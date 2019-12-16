@@ -76,6 +76,7 @@ function subirPorTipo(req, nombreArchivo, res) {
     var disciplina = new Disciplina({
         nombre: body.nombre,
         descripcion: body.descripcion,
+        tipo: body.tipo,
         img: nombreArchivo,
         usuario_id: body.usuario_id
 
