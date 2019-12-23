@@ -3,10 +3,10 @@ var Schema = mongoose.Schema;
 
 var calendarioSchema = new Schema({
     dia: { type: String, required: [true, 'El dia es requerido'] },
-    fecha: { type: Date, required: [true, 'La fecha es requerida'], default: Date.now },
+    fecha: { type: Date, unique: true, required: [true, 'La fecha es requerida'], default: Date.now },
     clases: [{
-        disciplina_id: { type: Schema.Types.ObjectId, ref: 'Disciplina', required: [true, 'La disciplina es obligatoria'] },
-        coach_id: { type: Schema.Types.ObjectId, ref: 'Coach', required: [true, 'El coach es obligatorio'] },
+        disciplinaId: { type: Schema.Types.ObjectId, ref: 'Disciplina', required: [true, 'La disciplina es obligatoria'] },
+        coachId: { type: Schema.Types.ObjectId, ref: 'Coach', required: [true, 'El coach es obligatorio'] },
         horario: { type: String, required: false },
         icono: { type: String, required: false, default: 'fa fa-map-marker' },
         espacios: [{

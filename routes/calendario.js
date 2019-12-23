@@ -16,11 +16,11 @@ app.get('/', (req, res, next) => {
     var limite = new Date();
     limite.setDate(limite.getDate() - 1);
     console.log(limite);
-    Calendario.find({"fecha": {$gte: limite}})
+    Calendario.find({ "fecha": { $gte: limite } })
         .skip(desde)
         .limit(6)
-        .populate('clases.disciplina_id', 'nombre img')
-        .populate('clases.coach_id', 'alias img')
+        .populate('clases.disciplinaId', 'nombre img tipo')
+        .populate('clases.coachId', 'alias img')
 
     .exec(
         (err, calendario) => {
@@ -55,8 +55,8 @@ app.get('/portipo/:tipo/:id', (req, res, next) => {
     }
     if (tipo === 'disciplina_id') {
         Calendario.find({ 'clases.disciplina_id': id })
-            .populate('clases.disciplina_id', 'nombre')
-            .populate('clases.coach_id', 'alias')
+            .populate('clases.disciplinaId', 'nombre')
+            .populate('clases.coachId', 'alias')
 
         .exec(
             (err, calendario) => {
@@ -112,8 +112,8 @@ app.get('/portipo/:tipo/:id', (req, res, next) => {
 app.get('/porclase/:id', (req, res) => {
     var id = req.params.id;
     Calendario.find({ 'clases._id': id }, { "clases.$": 1, "_id": 0 })
-        .populate('clases.disciplina_id', 'nombre img')
-        .populate('clases.coach_id', 'alias img')
+        .populate('clases.disciplinaId', 'nombre img tipo')
+        .populate('clases.coachId', 'alias img')
         .exec(
             (err, calendarioEncontrado) => {
 
@@ -178,7 +178,7 @@ app.put('/actualizar', (req, res) => {
     var columna = body.columna;
     var clasesDisp = body.clasesDisp;
     var objActualizar = '';
-    objActualizar = "clases.$.espacios." + espacio-1 + ".columnas." + columna-1 + ".usuario_id";
+    objActualizar = "clases.$.espacios." + espacio - 1 + ".columnas." + columna - 1 + ".usuario_id";
     if (clasesDisp <= 0) {
         return res.status(400).json({
             ok: false,
@@ -189,7 +189,6 @@ app.put('/actualizar', (req, res) => {
     columna = parseInt(columna);
     var newvalues = { $set: { "clases.$.espacios.1.columnas.1.usuario_id": usuarioId, "clases.$.espacios.1.columnas.1.status": 0, "clases.$.espacios.1.columnas.1.color": "disabled" } };
     switch (espacio) {
-
         case 1:
             switch (columna) {
                 case 1:
@@ -267,23 +266,17 @@ app.put('/actualizar', (req, res) => {
     console.log(newvalues);
     console.log(espacio);
     console.log(columna);
- 
-    // newvalues = { $set: { `clases.$.espacios.${espacio}.columnas.${columna}.usuario_id`: usuarioId, objActualizar: 0, objActualizar: "disabled" } };
     var myquery = {
-
         'clases._id': claseId,
         'clases.espacios._id': espacioId,
         'clases.espacios.columnas._id': columnaId
     };
-    newvalues[objActualizar]=usuarioId;
-    console.log('maricon' + objActualizar);
-
+    newvalues[objActualizar] = usuarioId;
     Calendario.find({ 'clases._id': claseId }, { '_id': false, 'dia': true, 'fecha': true, 'clases': { $elemMatch: { '_id': claseId } } })
-        .populate('clases.disciplina_id', 'nombre')
-        .populate('clases.coach_id', 'alias')
+        .populate('clases.disciplinaId', 'nombre')
+        .populate('clases.coachId', 'alias')
         .exec(
             (err, calendarioEncontrado) => {
-
                 if (err) {
                     return res.status(500).json({
                         ok: false,
@@ -297,8 +290,6 @@ app.put('/actualizar', (req, res) => {
                         errors: { message: 'no existe' }
                     });
                 }
-                console.log('mi objeto:  ');
-                console.log(calendarioEncontrado);
                 Usuario.findById(usuarioId, (err, usuario) => {
                     if (err) {
                         return res.status(500).json({
@@ -313,38 +304,27 @@ app.put('/actualizar', (req, res) => {
                             mensaje: 'Error no existe el usuario',
                             errors: err
                         });
-                        console.log('muyy mallllll');
                     }
-                    console.log(usuario);
                     calendarioEncontrado.push({ emailUser: usuario.email });
-                    console.log('aquii mirameeee');
-
-                    console.log(calendarioEncontrado);
-
                     EmailCtrl.sendEmail(calendarioEncontrado);
-
                 });
 
             });
     Calendario.updateOne(myquery, newvalues).exec(
         (err, calendario) => {
             if (err) {
-                console.log('some bad');
-
                 return res.status(500).json({
                     ok: false,
                     message: 'Ha ocurrido un error inesperado',
                     errors: err
                 });
             }
-            console.log('some goooood');
             res.status(200).json({
                 ok: true,
                 calendario: calendario
             });
         });
 });
-
 
 function restarClase(id) {
     var obj = [];
@@ -363,10 +343,7 @@ function restarClase(id) {
         .sort({ "finish_at": 1 })
         .exec(
             (err, paqUsuario) => {
-                if (err) {
-                    console.log('muyyyy mal 1');
-
-                }
+                if (err) {}
                 if (!paqUsuario) {
                     console.log("No existe");
 
@@ -386,4 +363,198 @@ function restarClase(id) {
             });
     return true;
 }
+
+function sumarClase(id) {
+    var obj = [];
+    var newvalues = {
+        $inc: {
+            "numClases": +1
+        }
+    };
+    var myquery = {};
+    PaqueteUsuario.find({
+            $and: [
+                { "usuarioId": id },
+                { "numClases": { $gt: 0 } }
+            ]
+        })
+        .sort({ "finish_at": 1 })
+        .exec(
+            (err, paqUsuario) => {
+                if (err) {}
+                if (!paqUsuario) {
+                    console.log("No existe");
+                }
+                console.log(paqUsuario);
+                myquery = { "_id": paqUsuario[0]._id };
+                console.log(myquery);
+                PaqueteUsuario.updateOne(myquery, newvalues).exec(
+                    (err, calendario) => {
+                        if (err) {
+                            console.log('muyyyy mal');
+                        }
+
+                        console.log("correctisimo");
+                    });
+
+            });
+    return true;
+}
+app.put('/cancelar', (req, res) => {
+    var body = req.body;
+    var claseId = body.claseId;
+    var espacioId = body.espacioId;
+    var columnaId = body.columnaId;
+    var usuarioId = body.usuarioId;
+    var espacio = body.espacio;
+    var columna = body.columna;
+    var clasesDisp = body.clasesDisp;
+    var objActualizar = '';
+    objActualizar = "clases.$.espacios." + espacio - 1 + ".columnas." + columna - 1 + ".usuario_id";
+    if (clasesDisp <= 0) {
+        // return res.status(400).json({
+        //     ok: false,
+        //     message: 'No cuenta con clases disponibles'
+        // });
+    }
+    espacio = parseInt(espacio);
+    columna = parseInt(columna);
+    var newvalues = { $unset: { "clases.$.espacios.1.columnas.1.usuario_id": '', "clases.$.espacios.1.columnas.1.color": "" } };
+    switch (espacio) {
+        case 1:
+            switch (columna) {
+                case 1:
+                    newvalues = { $unset: { "clases.$.espacios.0.columnas.0.usuario_id": '', "clases.$.espacios.0.columnas.0.color": '' } };
+                    break;
+                case 2:
+                    newvalues = { $unset: { "clases.$.espacios.0.columnas.1.usuario_id": '', "clases.$.espacios.0.columnas.1.color": '' } };
+                    break;
+            }
+            break;
+
+        case 2:
+            switch (columna) {
+                case 1:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.0.usuario_id": '', "clases.$.espacios.1.columnas.0.color": '' } };
+                    break;
+                case 2:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.1.usuario_id": '', "clases.$.espacios.1.columnas.1.color": '' } };
+                    break;
+                case 3:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.2.usuario_id": '', "clases.$.espacios.1.columnas.2.color": '' } };
+                    break;
+                case 4:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.3.usuario_id": '', "clases.$.espacios.1.columnas.3.color": '' } };
+                    break;
+                case 5:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.4.usuario_id": '', "clases.$.espacios.1.columnas.4.color": '' } };
+                    break;
+                case 6:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.5.usuario_id": '', "clases.$.espacios.1.columnas.5.color": '' } };
+                    break;
+                case 7:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.6.usuario_id": '', "clases.$.espacios.1.columnas.6.color": '' } };
+                    break;
+                case 8:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.7.usuario_id": '', "clases.$.espacios.1.columnas.7.color": '' } };
+                    break;
+                case 9:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.8.usuario_id": '', "clases.$.espacios.1.columnas.8.color": '' } };
+                    break;
+                case 10:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.9.usuario_id": '', "clases.$.espacios.1.columnas.9.color": '' } };
+                    break;
+                case 11:
+                    newvalues = { $unset: { "clases.$.espacios.1.columnas.10.usuario_id": '', "clases.$.espacios.1.columnas.10.color": '' } };
+            }
+            break;
+        case 3:
+            switch (columna) {
+                case 1:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.0.usuario_id": '', "clases.$.espacios.2.columnas.0.color": '' } };
+                    break;
+                case 2:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.1.usuario_id": '', "clases.$.espacios.2.columnas.1.color": '' } };
+                    break;
+                case 2:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.2.usuario_id": '', "clases.$.espacios.2.columnas.2.color": '' } };
+                    break;
+                case 3:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.3.usuario_id": '', "clases.$.espacios.2.columnas.3.color": '' } };
+                    break;
+                case 5:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.4.usuario_id": '', "clases.$.espacios.2.columnas.4.color": '' } };
+                    break;
+                case 6:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.5.usuario_id": '', "clases.$.espacios.2.columnas.5.color": '' } };
+                    break;
+                case 7:
+                    newvalues = { $unset: { "clases.$.espacios.2.columnas.6.usuario_id": '', "clases.$.espacios.2.columnas.6.color": '' } };
+                    break;
+            }
+            break;
+    }
+    sumarClase(usuarioId)
+    console.log(newvalues);
+    console.log(espacio);
+    console.log(columna);
+    var myquery = {
+        'clases._id': claseId,
+        'clases.espacios._id': espacioId,
+        'clases.espacios.columnas._id': columnaId
+    };
+    newvalues[objActualizar] = usuarioId;
+    Calendario.find({ 'clases._id': claseId }, { '_id': false, 'dia': true, 'fecha': true, 'clases': { $elemMatch: { '_id': claseId } } })
+        .populate('clases.disciplinaId', 'nombre')
+        .populate('clases.coachId', 'alias')
+        .exec(
+            (err, calendarioEncontrado) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        message: "Error al buscar el calendario"
+                    });
+                }
+                if (!calendarioEncontrado) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'El calendario con el id ' + claseId + ' no existe',
+                        errors: { message: 'no existe' }
+                    });
+                }
+                Usuario.findById(usuarioId, (err, usuario) => {
+                    if (err) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error buscar usuario',
+                            errors: err
+                        });
+                    }
+                    if (!usuario) {
+                        return res.status(500).json({
+                            ok: false,
+                            mensaje: 'Error no existe el usuario',
+                            errors: err
+                        });
+                    }
+                    //calendarioEncontrado.push({ emailUser: usuario.email });
+                    //EmailCtrl.sendEmail(calendarioEncontrado);
+                });
+
+            });
+    Calendario.updateOne(myquery, newvalues).exec(
+        (err, calendario) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    message: 'Ha ocurrido un error inesperado',
+                    errors: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                calendario: calendario
+            });
+        });
+});
 module.exports = app;

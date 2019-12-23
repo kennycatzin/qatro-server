@@ -1,9 +1,10 @@
 var express = require('express');
 var app = express();
 // var Hospital = require('./../models/hospital');
-// var Medico = require('./../models/medico');
+var Disciplina = require('./../models/disciplina');
 var Usuario = require('./../models/usuario');
 var Paquete = require('./../models/paquete');
+var Coach = require('./../models/coach');
 
 //Rutas
 app.get('/coleccion/:tabla/:busqueda', (req, res) => {
@@ -17,12 +18,14 @@ app.get('/coleccion/:tabla/:busqueda', (req, res) => {
             promesa = buscarUsuario(busqueda, regex);
             break;
         case 'paquetes':
-            console.log('ya llegue');
             promesa = buscarPaquete(busqueda, regex);
             break;
-            // case 'medicos':
-            //     promesa = buscarMedicos(busqueda, regex);
-            //     break;
+        case 'disciplinas':
+            promesa = buscarDisciplina(busqueda, regex);
+            break;
+        case 'coaches':
+            promesa = buscarCoach(busqueda, regex);
+            break;
         default:
             return res.status(400).json({
                 ok: false,
@@ -109,19 +112,38 @@ function buscarPaquete(busqueda, regex) {
     });
 }
 
-// function buscarMedicos(busqueda, regex) {
-//     return new Promise((resolve, reject) => {
-//         Medico.find({ nombre: regex })
-//             .populate('usuario_id')
-//             .exec(
-//                 (err, medico) => {
-//                     if (err) {
-//                         reject('Error al cargar medicos', err);
-//                     } else {
-//                         resolve(medico)
-//                     }
-//                 });
-//     });
+function buscarDisciplina(busqueda, regex) {
+    return new Promise((resolve, reject) => {
+        Disciplina.find({})
+            .or([{ 'nombre': regex }])
+            .exec((err, disciplina) => {
+                if (err) {
+                    reject('Error al cargar disciplinas', err);
+                } else {
+                    resolve(disciplina);
+                }
 
-// }
+            })
+
+    });
+
+}
+
+function buscarCoach(busqueda, regex) {
+    return new Promise((resolve, reject) => {
+        Coach.find({})
+            .or([{ 'nombre': regex }, { 'alias': regex }])
+            .exec((err, coach) => {
+                if (err) {
+                    reject('Error al cargar coach', err);
+                } else {
+                    resolve(coach);
+                }
+
+            })
+
+    });
+
+}
+
 module.exports = app;

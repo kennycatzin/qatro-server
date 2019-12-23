@@ -14,14 +14,11 @@ function formatDate(date) {
         "Agosto", "Septiembre", "Octubre",
         "Noviembre", "Diciembre"
     ];
-
     var day = date.getDate();
     var monthIndex = date.getMonth();
     var year = date.getFullYear();
-
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
 }
-
 
 exports.sendEmail = function(req, res) {
     // Definimos el transporter
@@ -30,29 +27,14 @@ exports.sendEmail = function(req, res) {
     var userMail = req[1].emailUser;
     var username = 'kenny';
     var password = '12345';
-    console.log(req);
     var dia = req2.dia;
     var horario = req2.clases[0].horario;
     var fecha = req2.fecha;
     var hoy = new Date();
-    var dis = req2.clases[0].disciplina_id.nombre;
-    console.log(dis);
-    console.log(horario);
-    console.log(dia);
-    console.log(userMail);
+    var dis = req2.clases[0].disciplinaId.nombre;
     hoy = formatDate(hoy);
     fecha = formatDate(fecha);
-    console.log('llegueeeee');
 
-    // var transporter = nodemailer.createTransport(smtpTransport({
-    //     host: 'serteza.com',
-    //     port: 587,
-    //     secure: false, // upgrade later with STARTTLS
-    //     auth: {
-    //         user: 'prorsum@serteza.com',
-    //         pass: '()j_%*.8n9Vz'
-    //     }
-    // }));
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {

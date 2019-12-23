@@ -30,8 +30,6 @@ app.get('/numero/:id', (req, res, next) => {
     var userid = new ObjectID(id);
     var fechaHoy = new Date;
     fecha = Date.now();
-    console.log(userid);
-
     PaqueteUsuario.estimatedDocumentCount({ "usuarioId": userid }, (err, conteo) => {
 
         if (err) {
@@ -41,7 +39,6 @@ app.get('/numero/:id', (req, res, next) => {
                 errors: err
             });
         }
-        console.log('conteo ' + conteo);
         if (conteo === 0) {
             return res.status(500).json({
                 ok: false,
@@ -55,10 +52,10 @@ app.get('/numero/:id', (req, res, next) => {
                         $project: {
                             _id: null,
                             clasesDisponibles: {
-                                $cond: [{ $gte: ["$finish_at", fechaHoy] }, { $sum: "$numClases" }, 0]
+                                $cond: [{ $gte: ["$finishAt", fechaHoy] }, { $sum: "$numClases" }, 0]
                             },
                             fecha: {
-                                $dateToString: { format: "%Y-%m-%d", date: "$finish_at" }
+                                $dateToString: { format: "%Y-%m-%d", date: "$finishAt" }
                             }
                         }
                     },
@@ -81,21 +78,26 @@ app.get('/numero/:id', (req, res, next) => {
                             errors: err
                         });
                     }
-                    console.log(paqusuario);
-                    res.status(200).json({
-                        ok: true,
-                        total: paqusuario[0].total,
-                        fecha: paqusuario[0].fecha
-                    });
+                    if (paqusuario.length > 0) {
+                        res.status(200).json({
+
+                            ok: true,
+                            total: paqusuario[0].total,
+                            fecha: paqusuario[0].fecha
+
+                        });
+                    } else {
+                        res.status(200).json({
+                            ok: true,
+                            total: 0,
+                            fecha: new Date()
+
+                        });
+                    }
+
                 });
         }
     })
-
-
-
-
-
-
 });
 app.post('/', (req, res, next) => {
     var body = req.body;
@@ -103,7 +105,7 @@ app.post('/', (req, res, next) => {
         usuarioId: body.usuarioId,
         paqueteId: body.paqueteId,
         created_at: Date.now(),
-        finish_at: body.finish_at,
+        finishAt: body.finishAt,
         numClases: body.numClases
     });
     paqueteUsuario.save((err, paqueteUsuarioGuardado) => {
@@ -121,6 +123,80 @@ app.post('/', (req, res, next) => {
         });
     });
 });
+app.get('/disponibilidad/:id', (req, res, next) => {
+    var id = req.params.id;
+    var userid = new ObjectID(id);
+    var fechaHoy = new Date;
+    fecha = Date.now();
+    PaqueteUsuario.estimatedDocumentCount({ "usuarioId": userid })
+        .populate('usuarioId', 'nombre')
+        .exec(
+            (err, conteo) => {
 
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error buscar por usuario',
+                        errors: err
+                    });
+                }
+                if (conteo === 0) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error buscar, Debe cargar un paquete',
+                        errors: err
+                    });
+                } else {
+                    PaqueteUsuario.aggregate(
+                        [{ $match: { "usuarioId": userid } },
+                            {
+                                $project: {
+                                    _id: null,
+                                    clasesDisponibles: {
+                                        $cond: [{ $gte: ["$finishAt", fechaHoy] }, { $sum: "$numClases" }, 0]
+                                    },
+                                    fecha: {
+                                        $dateToString: { format: "%Y-%m-%d", date: "$finishAt" }
+                                    }
+                                }
+                            },
+                            {
+                                $group: {
+                                    _id: null,
+                                    total: {
+                                        $sum: "$clasesDisponibles"
+                                    },
+                                    fecha: {
+                                        $max: "$fecha"
+                                    }
+                                }
+                            }
+                        ], (err, paqusuario) => {
+                            console.log(paqusuario);
+                            if (err) {
+                                return res.status(500).json({
+                                    ok: false,
+                                    message: 'Ha ocurrido un error inesperado',
+                                    errors: err
+                                });
+                            }
+                            if (paqusuario.length > 0) {
+                                res.status(200).json({
+                                    ok: true,
+                                    total: paqusuario[0].total,
+                                    fecha: paqusuario[0].fecha
+                                });
+                            } else {
+                                res.status(200).json({
+                                    ok: true,
+                                    total: 0,
+                                    fecha: new Date()
+                                });
+                            }
+
+                        });
+                }
+            })
+});
 
 module.exports = app;

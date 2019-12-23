@@ -8,9 +8,12 @@ var Disciplina = require('./../models/disciplina');
 var fs = require('fs');
 app.use(fileupload());
 
-
 app.get('/', (req, res, next) => {
-    Disciplina.find({}, 'nombre descripcion img')
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+    Disciplina.find({}, 'nombre descripcion img tipo')
+        .skip(desde)
+        .limit(6)
         .exec(
             (err, disciplinas) => {
                 if (err) {
@@ -20,10 +23,15 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
-                res.status(200).json({
-                    ok: true,
-                    disciplinas: disciplinas
-                });
+                Disciplina.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        disciplinas: disciplinas,
+                        numero: conteo
+
+
+                    });
+                })
             })
 });
 
@@ -97,6 +105,74 @@ function subirPorTipo(req, nombreArchivo, res) {
     });
 
 }
+
+// Crear nuevo usuario
+app.post('/nuevo/', (req, res) => {
+    var body = req.body;
+    var disciplina = new Disciplina({
+        nombre: body.nombre,
+        descripcion: body.descripcion,
+        tipo: body.tipo,
+        img: "xxx.jpg",
+        usuario_id: body.usuario_id
+
+    });
+    disciplina.save((err, disciplinaGuardada) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al crear la disciplina',
+                errors: err
+            });
+        }
+        res.status(201).json({
+            ok: true,
+            disciplina: disciplinaGuardada,
+            usuarioToken: req.disciplina
+        });
+    });
+
+});
+
+app.put('/:id', (req, res) => {
+    var id = req.params.id;
+    var body = req.body;
+    Disciplina.findById(id, (err, disciplina) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error buscar disciplina',
+                errors: err
+            });
+        }
+        if (!disciplina) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La disciplina con el id' + id + 'no existe',
+                errors: { message: 'no existe' }
+            });
+        }
+        disciplina.nombre = body.nombre;
+        disciplina.descripcion = body.descripcion;
+        disciplina.tipo = body.tipo;
+
+        disciplina.save((err, disciplinaGuardado) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar disciplina',
+                    errors: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                disciplina: disciplinaGuardado
+            });
+        });
+
+    });
+
+});
 
 
 

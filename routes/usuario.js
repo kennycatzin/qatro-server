@@ -161,10 +161,6 @@ function obtenerMenu(ROLE) {
             url: '/admin_calendario'
         },
         {
-            titulo: 'Coaches',
-            url: '/admin_coaches'
-        },
-        {
             titulo: 'Disciplinas',
             url: '/admin_disciplinas'
         },

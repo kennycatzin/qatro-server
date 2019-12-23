@@ -29,7 +29,47 @@ router.get('/admin/', (req, res, next) => {
 
             })
 });
+router.put('/:id', (req, res) => {
+    var id = req.params.id;
+    var body = req.body;
+    Paquete.findById(id, (err, paquete) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error buscar paquete',
+                errors: err
+            });
+        }
+        if (!paquete) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'paquete con el id' + id + 'no existe',
+                errors: { message: 'no existe' }
+            });
+        }
+        paquete.nombre = body.nombre;
+        paquete.numeroClases = body.numeroClases;
+        paquete.precioUnitario = body.precioUnitario;
+        paquete.vigencia = body.vigencia;
 
+
+        paquete.save((err, paqueteGuardado) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Error al actualizar paquete',
+                    errors: err
+                });
+            }
+            res.status(200).json({
+                ok: true,
+                paquete: paqueteGuardado
+            });
+        });
+
+    });
+
+});
 router.delete('/:id', (req, res) => {
     var id = req.params.id;
 
