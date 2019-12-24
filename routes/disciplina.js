@@ -34,7 +34,23 @@ app.get('/', (req, res, next) => {
                 })
             })
 });
+app.delete('/:id', (req, res) => {
+    var id = req.params.id;
 
+    Disciplina.findByIdAndRemove(id, (err, disciplinaBorrado) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al borrar disciplina',
+                errors: err
+            });
+        }
+        res.status(200).json({
+            ok: true,
+            disciplina: disciplinaBorrado
+        });
+    });
+});
 app.post('/', (req, res) => {
 
     if (!req.files) {

@@ -49,7 +49,8 @@ app.put('/:tipo/:id', (req, res, next) => {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al mover archivo'
+                mensaje: 'Error al mover archivo',
+                ar: err
             })
         }
         subirPorTipo(tipo, id, nombreArchivo, res)

@@ -24,6 +24,23 @@ app.get('/', (req, res, next) => {
                 });
             })
 });
+app.delete('/:id', (req, res) => {
+    var id = req.params.id;
+
+    Coach.findByIdAndRemove(id, (err, coachBorrado) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al borrar coach',
+                errors: err
+            });
+        }
+        res.status(200).json({
+            ok: true,
+            coach: coachBorrado
+        });
+    });
+});
 app.get('/admin/', (req, res, next) => {
     var desde = req.query.desde || 0;
     desde = Number(desde);
