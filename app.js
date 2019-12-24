@@ -44,7 +44,7 @@ var prod = 'mongodb+srv://serteza:aleatorio2506@cluster0-vdo2o.mongodb.net/test?
 // entorno local: mongodb://localhost:27017/qatro-server
 // mongodb + srv: //serteza:<password>@cluster0-vdo2o.mongodb.net/test?retryWrites=true&w=majority
 //Conexion a la base de datossss
-mongoose.connection.openUri(local, (err, res) => {
+mongoose.connection.openUri(prod, (err, res) => {
     if (err) throw err;
     console.log('Base de datos:  \x1b[32m%s\x1b[0m', 'online');
 
