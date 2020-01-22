@@ -65,7 +65,7 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
             if (!usuario) {
                 return res.status(400).json({
                     ok: true,
-                    mensaje: 'No existe el usuario',
+                    mensaje: 'No existe usuario',
                     errors: err
 
                 });
