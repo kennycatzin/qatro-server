@@ -79,7 +79,7 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
                 if (err) {
                     return res.status(500).json({
                         ok: true,
-                        mensaje: 'Ha ocurrido un error al subir la imagen',
+                        mensaje: 'Ha ocurrido un error al subir  imagen',
                         errors: err
                     });
                 }
