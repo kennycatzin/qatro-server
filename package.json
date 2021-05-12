@@ -18,7 +18,7 @@
         "moment-timezone": "^0.5.27",
         "mongoose": "^5.6.4",
         "mongoose-unique-validator": "^2.0.3",
-        "nodemailer": "^6.3.1",
+        "nodemailer": "^6.4.16",
         "nodemailer-smtp-transport": "^2.7.4",
         "serve-index": "^1.9.1"
     }
